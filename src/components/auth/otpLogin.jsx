@@ -1,55 +1,41 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  sendOtp,
+  verifyOtp,
+  loadCurrentUser,
+} from "../../features/auth/authThunks";
 import { resetAuthError } from "../../features/auth/authSlice";
 import PropTypes from "prop-types";
 
 const OtpLogin = ({ onSuccess, onBack }) => {
   const dispatch = useDispatch();
 
+  const { otpLoading, otpError, status, error } = useSelector(
+    (state) => state.auth,
+  );
+
   const [step, setStep] = useState("REQUEST"); // REQUEST | VERIFY
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleSendOtp = async () => {
-    if (!email) {
-      setError("Email is required");
-      return;
-    }
-
-    setError("");
+    if (!email) return;
     dispatch(resetAuthError());
-    setLoading(true);
 
-    try {
-      // 🔥 API call placeholder
-      // await dispatch(sendOtp(email));
+    const result = await dispatch(sendOtp(email));
+    if (sendOtp.fulfilled.match(result)) {
       setStep("VERIFY");
-    } catch (e) {
-      setError("Failed to send OTP");
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp || otp.length < 4) {
-      setError("Invalid OTP");
-      return;
-    }
+    if (!otp || otp.length < 4) return;
 
-    setError("");
-    setLoading(true);
-
-    try {
-      // 🔥 API call placeholder
-      // await dispatch(verifyOtp({ email, otp }));
+    const result = await dispatch(verifyOtp({ email, otp }));
+    if (verifyOtp.fulfilled.match(result)) {
+      await dispatch(loadCurrentUser());
       onSuccess?.();
-    } catch (e) {
-      setError("Invalid or expired OTP");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -67,10 +53,10 @@ const OtpLogin = ({ onSuccess, onBack }) => {
 
           <button
             onClick={handleSendOtp}
-            disabled={loading}
+            disabled={otpLoading}
             className="w-full bg-red-500 text-white py-3 rounded-lg"
           >
-            {loading ? "Sending..." : "Send OTP"}
+            {otpLoading ? "Sending..." : "Send OTP"}
           </button>
         </>
       )}
@@ -87,10 +73,10 @@ const OtpLogin = ({ onSuccess, onBack }) => {
 
           <button
             onClick={handleVerifyOtp}
-            disabled={loading}
+            disabled={status === "loading"}
             className="w-full bg-green-500 text-white py-3 rounded-lg"
           >
-            {loading ? "Verifying..." : "Verify OTP"}
+            {status === "loading" ? "Verifying..." : "Verify OTP"}
           </button>
 
           <button
@@ -102,7 +88,9 @@ const OtpLogin = ({ onSuccess, onBack }) => {
         </>
       )}
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {(otpError || error) && (
+        <p className="text-red-500 text-sm">{otpError || error}</p>
+      )}
 
       <button onClick={onBack} className="text-sm text-gray-400 underline">
         Back to login
@@ -110,8 +98,10 @@ const OtpLogin = ({ onSuccess, onBack }) => {
     </div>
   );
 };
+
 OtpLogin.propTypes = {
   onSuccess: PropTypes.func,
   onBack: PropTypes.func.isRequired,
 };
+
 export default OtpLogin;

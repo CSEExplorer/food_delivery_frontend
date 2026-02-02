@@ -4,6 +4,8 @@ import {
   registerUser,
   fetchCurrentUser,
   logout as logoutApi,
+  sendOtp as sendOtpApi,
+  verifyOtp as verifyOtpApi,
 } from "../../api/authApi";
 
 /**
@@ -69,6 +71,33 @@ export const logout = createAsyncThunk(
       return true;
     } catch (error) {
       return rejectWithValue("Logout failed");
+    }
+  },
+);
+
+export const sendOtp = createAsyncThunk(
+  "auth/sendOtp",
+  async (email, { rejectWithValue }) => {
+    try {
+      const response = await sendOtpApi(email);
+      return response.data;
+      // expected: { message: "OTP sent successfully" }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to send OTP",
+      );
+    }
+  },
+);
+
+export const verifyOtp = createAsyncThunk(
+  "auth/verifyOtp",
+  async ({ email, otp }, { rejectWithValue }) => {
+    try {
+      await verifyOtpApi(email, otp);
+      return true; // cookie is set, no payload needed
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Invalid OTP");
     }
   },
 );

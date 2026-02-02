@@ -1,11 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login, register, loadCurrentUser, logout } from "./authThunks";
+import {
+  login,
+  register,
+  loadCurrentUser,
+  logout,
+  sendOtp,
+  verifyOtp,
+} from "./authThunks";
 
 const initialState = {
   user: null,
   isAuthenticated: false,
+
   status: "idle", // idle | loading | error
   error: null,
+
+  // 🔐 OTP FLOW
+  otpLoading: false,
+  otpSent: false,
+  otpError: null,
 };
 
 const authSlice = createSlice({
@@ -14,6 +27,11 @@ const authSlice = createSlice({
   reducers: {
     resetAuthError(state) {
       state.error = null;
+    },
+    resetOtpState(state) {
+      state.otpLoading = false;
+      state.otpSent = false;
+      state.otpError = null;
     },
   },
   extraReducers: (builder) => {
@@ -75,9 +93,38 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
         state.status = "idle";
+      })
+
+      // =====================
+      // SEND OTP
+      // =====================
+      .addCase(sendOtp.pending, (state) => {
+        state.otpLoading = true;
+        state.otpError = null;
+      })
+      .addCase(sendOtp.fulfilled, (state) => {
+        state.otpLoading = false;
+        state.otpSent = true;
+      })
+      .addCase(sendOtp.rejected, (state, action) => {
+        state.otpLoading = false;
+        state.otpError = action.payload;
+      })
+
+      .addCase(verifyOtp.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(verifyOtp.fulfilled, (state) => {
+        state.status = "idle";
+        state.isAuthenticated = true;
+      })
+      .addCase(verifyOtp.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload;
       });
   },
 });
+export const { resetAuthError, resetOtpState } = authSlice.actions;
 
-export const { resetAuthError } = authSlice.actions;
 export default authSlice.reducer;

@@ -19,3 +19,16 @@ export const refreshAccessToken = () => {
 export const logout = () => {
   return axiosInstance.post("/api/auth/jwt/logout");
 };
+
+export const sendOtp = (email) => {
+  return axiosInstance.post("/auth/otp/request", {
+    email,
+  });
+};
+
+export const verifyOtp = (email, otp) => {
+  return axiosInstance.post("/auth/otp/login", {
+    email,
+    otp,
+  });
+};
