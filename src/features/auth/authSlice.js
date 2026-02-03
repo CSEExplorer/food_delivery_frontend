@@ -12,13 +12,27 @@ const initialState = {
   user: null,
   isAuthenticated: false,
 
-  status: "idle", // idle | loading | error
+  status: "idle",
   error: null,
 
   // 🔐 OTP FLOW
   otpLoading: false,
   otpSent: false,
   otpError: null,
+};
+
+const normalizeError = (payload) => {
+  if (!payload) {
+    return { message: "Something went wrong" };
+  }
+
+  // backend format
+  if (payload.error) {
+    return payload.error;
+  }
+
+  // fallback
+  return { message: payload };
 };
 
 const authSlice = createSlice({
@@ -68,7 +82,7 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.status = "error";
-        state.error = action.payload;
+        state.error = normalizeError(action.payload);
       })
 
       // =====================
@@ -83,7 +97,7 @@ const authSlice = createSlice({
       })
       .addCase(register.rejected, (state, action) => {
         state.status = "error";
-        state.error = action.payload;
+        state.error = normalizeError(action.payload);
       })
 
       // =====================
@@ -108,7 +122,7 @@ const authSlice = createSlice({
       })
       .addCase(sendOtp.rejected, (state, action) => {
         state.otpLoading = false;
-        state.otpError = action.payload;
+        state.otpError = normalizeError(action.payload);
       })
 
       .addCase(verifyOtp.pending, (state) => {
@@ -121,7 +135,7 @@ const authSlice = createSlice({
       })
       .addCase(verifyOtp.rejected, (state, action) => {
         state.status = "error";
-        state.error = action.payload;
+        state.error = normalizeError(action.payload);
       });
   },
 });

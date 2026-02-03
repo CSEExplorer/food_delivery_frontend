@@ -10,26 +10,23 @@ import {
 
 /**
  * 🔐 LOGIN
- * Cookies are set by backend
  */
 export const login = createAsyncThunk(
   "auth/login",
   async ({ usernameOrEmail, password }, { rejectWithValue }) => {
     try {
       await loginUser({ usernameOrEmail, password });
-
-      // After login, immediately fetch user
       const response = await fetchCurrentUser();
+      // console.log(response);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Login failed");
+      return rejectWithValue(error.response?.data);
     }
   },
 );
 
 /**
  * 🆕 REGISTER
- * Does NOT auto-login (matches your current behavior)
  */
 export const register = createAsyncThunk(
   "auth/register",
@@ -38,14 +35,13 @@ export const register = createAsyncThunk(
       await registerUser(data);
       return true;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Registration failed");
+      return rejectWithValue(error.response?.data);
     }
   },
 );
 
 /**
  * 👤 LOAD CURRENT USER
- * Called on app start / refresh
  */
 export const loadCurrentUser = createAsyncThunk(
   "auth/loadCurrentUser",
@@ -54,14 +50,13 @@ export const loadCurrentUser = createAsyncThunk(
       const response = await fetchCurrentUser();
       return response.data;
     } catch (error) {
-      return rejectWithValue("Not authenticated");
+      return rejectWithValue(error.response?.data);
     }
   },
 );
 
 /**
  * 🚪 LOGOUT
- * Backend clears cookies
  */
 export const logout = createAsyncThunk(
   "auth/logout",
@@ -70,34 +65,37 @@ export const logout = createAsyncThunk(
       await logoutApi();
       return true;
     } catch (error) {
-      return rejectWithValue("Logout failed");
+      return rejectWithValue(error.response?.data);
     }
   },
 );
 
+/**
+ * 📧 SEND OTP
+ */
 export const sendOtp = createAsyncThunk(
   "auth/sendOtp",
   async (email, { rejectWithValue }) => {
     try {
       const response = await sendOtpApi(email);
       return response.data;
-      // expected: { message: "OTP sent successfully" }
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to send OTP",
-      );
+      return rejectWithValue(error.response?.data);
     }
   },
 );
 
+/**
+ * 🔢 VERIFY OTP
+ */
 export const verifyOtp = createAsyncThunk(
   "auth/verifyOtp",
   async ({ email, otp }, { rejectWithValue }) => {
     try {
       await verifyOtpApi(email, otp);
-      return true; // cookie is set, no payload needed
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Invalid OTP");
+      return true;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
     }
   },
 );
