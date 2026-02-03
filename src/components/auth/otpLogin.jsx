@@ -1,41 +1,34 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  sendOtp,
-  verifyOtp,
-  loadCurrentUser,
-} from "../../features/auth/authThunks";
-import { resetAuthError } from "../../features/auth/authSlice";
 import PropTypes from "prop-types";
+import { useAuth } from "../../hooks/useAuth";
 
 const OtpLogin = ({ onSuccess, onBack }) => {
-  const dispatch = useDispatch();
+  const {
+    sendOtp,
+    verifyOtp,
+    otpLoading,
+    status,
+    otpError,
+    error,
+    resetError,
+  } = useAuth();
 
-  const { otpLoading, otpError, status, error } = useSelector(
-    (state) => state.auth,
-  );
-
-  const [step, setStep] = useState("REQUEST"); // REQUEST | VERIFY
+  const [step, setStep] = useState("REQUEST");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
 
   const handleSendOtp = async () => {
-    if (!email) return;
-    dispatch(resetAuthError());
-
-    const result = await dispatch(sendOtp(email));
-    if (sendOtp.fulfilled.match(result)) {
+    resetError();
+    const res = await sendOtp(email);
+    if (res.meta.requestStatus === "fulfilled") {
       setStep("VERIFY");
     }
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp || otp.length < 4) return;
-
-    const result = await dispatch(verifyOtp({ email, otp }));
-    if (verifyOtp.fulfilled.match(result)) {
-      await dispatch(loadCurrentUser());
-      onSuccess?.();
+    const res = await verifyOtp({ email, otp });
+    if (res.meta.requestStatus === "fulfilled") {
+      onSuccess();
     }
   };
 
@@ -50,7 +43,6 @@ const OtpLogin = ({ onSuccess, onBack }) => {
             placeholder="Enter your email"
             className="w-full border rounded-lg px-4 py-3"
           />
-
           <button
             onClick={handleSendOtp}
             disabled={otpLoading}
@@ -70,7 +62,6 @@ const OtpLogin = ({ onSuccess, onBack }) => {
             placeholder="Enter OTP"
             className="w-full border rounded-lg px-4 py-3"
           />
-
           <button
             onClick={handleVerifyOtp}
             disabled={status === "loading"}
@@ -78,7 +69,6 @@ const OtpLogin = ({ onSuccess, onBack }) => {
           >
             {status === "loading" ? "Verifying..." : "Verify OTP"}
           </button>
-
           <button
             onClick={() => setStep("REQUEST")}
             className="text-sm text-gray-500"

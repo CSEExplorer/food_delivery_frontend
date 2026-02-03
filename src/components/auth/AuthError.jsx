@@ -1,14 +1,13 @@
-import { useSelector } from "react-redux";
+import { useAuth } from "../../hooks/useAuth";
 
 const AuthError = () => {
-  const { status, error } = useSelector((state) => state.auth);
-  console.log(status, error);
+  const { error, status } = useAuth();
+
   if (status !== "error" || !error) return null;
 
   return (
     <div className="bg-red-50 border border-red-300 text-red-600 text-sm p-3 rounded-lg">
-      {/* Main error message */}
-      {error && <p className="font-medium mb-2 text-center">{error.message}</p>}
+      <p className="font-medium mb-2 text-center">{error.message}</p>
     </div>
   );
 };

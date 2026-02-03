@@ -1,33 +1,28 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
-import { useDispatch } from "react-redux";
 
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import LoginPopUp from "./components/auth/LoginPopUp";
-import { loadCurrentUser } from "./features/auth/authThunks";
+import AuthModal from "./components/auth/AuthModal";
+import { useAuthBootstrap } from "./hooks/useAuthBootstrap";
 
 function App() {
   /**
    * authModal:
    *  - null     → closed
-   *  - "login"  → login popup
-   *  - "signup" → signup popup
+   *  - "login"  → login screen
+   *  - "signup" → signup screen
    */
   const [authModal, setAuthModal] = useState(null);
 
-  const dispatch = useDispatch();
-
-  // Load user on app start (refresh-safe auth)
-  useEffect(() => {
-    dispatch(loadCurrentUser());
-  }, [dispatch]);
+  // 🔐 Load user on app start (refresh-safe auth)
+  useAuthBootstrap();
 
   return (
     <>
       {/* Auth Modal */}
-      {authModal && <LoginPopUp mode={authModal} setShowLogin={setAuthModal} />}
+      {authModal && <AuthModal mode={authModal} setShowLogin={setAuthModal} />}
 
       {/* Navbar */}
       <Navbar setShowLogin={setAuthModal} />
