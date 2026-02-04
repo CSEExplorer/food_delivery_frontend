@@ -1,34 +1,67 @@
-import axiosInstance from "./axiosInstance";
+import { request } from "./request";
+import { SERVICE_URLS } from "./serviceUrls";
+
+/**
+ * AUTH SERVICE (8080)
+ * All auth-related calls live here
+ */
 
 export const loginUser = (data) => {
-  return axiosInstance.post("/api/auth/jwt/login", data);
+  return request({
+    service: SERVICE_URLS.AUTH,
+    url: "/api/auth/jwt/login",
+    method: "POST",
+    data,
+  });
 };
 
 export const registerUser = (data) => {
-  return axiosInstance.post("/api/auth/jwt/register", data);
+  return request({
+    service: SERVICE_URLS.AUTH,
+    url: "/api/auth/jwt/register",
+    method: "POST",
+    data,
+  });
 };
 
 export const fetchCurrentUser = () => {
-  return axiosInstance.get("/api/auth/jwt/me");
+  return request({
+    service: SERVICE_URLS.AUTH,
+    url: "/api/auth/jwt/me",
+    method: "GET",
+  });
 };
 
 export const refreshAccessToken = () => {
-  return axiosInstance.post("/api/auth/jwt/refresh");
+  return request({
+    service: SERVICE_URLS.AUTH,
+    url: "/api/auth/jwt/refresh",
+    method: "POST",
+  });
 };
 
 export const logout = () => {
-  return axiosInstance.post("/api/auth/jwt/logout");
+  return request({
+    service: SERVICE_URLS.AUTH,
+    url: "/api/auth/jwt/logout",
+    method: "POST",
+  });
 };
 
 export const sendOtp = (email) => {
-  return axiosInstance.post("/auth/otp/request", {
-    email,
+  return request({
+    service: SERVICE_URLS.AUTH,
+    url: "/auth/otp/request",
+    method: "POST",
+    data: { email },
   });
 };
 
 export const verifyOtp = (email, otp) => {
-  return axiosInstance.post("/auth/otp/login", {
-    email,
-    otp,
+  return request({
+    service: SERVICE_URLS.AUTH,
+    url: "/auth/otp/login",
+    method: "POST",
+    data: { email, otp },
   });
 };

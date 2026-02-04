@@ -15,6 +15,9 @@ const initialState = {
   status: "idle",
   error: null,
 
+  showAuthModal: false,
+  authMode: "login", // "login" | "signup"
+
   // 🔐 OTP FLOW
   otpLoading: false,
   otpSent: false,
@@ -47,6 +50,13 @@ const authSlice = createSlice({
       state.otpSent = false;
       state.otpError = null;
     },
+    openAuthModal: (state, action) => {
+      state.showAuthModal = true;
+      state.authMode = action.payload || "login";
+    },
+    closeAuthModal: (state) => {
+      state.showAuthModal = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -58,7 +68,11 @@ const authSlice = createSlice({
         state.status = "loading";
       })
       .addCase(loadCurrentUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+        console.log("hii", action.payload);
+        state.user = {
+          id: action.payload.id,
+          email: action.payload.email,
+        };
         state.isAuthenticated = true;
         state.status = "idle";
       })
@@ -139,6 +153,7 @@ const authSlice = createSlice({
       });
   },
 });
-export const { resetAuthError, resetOtpState } = authSlice.actions;
+export const { resetAuthError, resetOtpState, openAuthModal, closeAuthModal } =
+  authSlice.actions;
 
 export default authSlice.reducer;

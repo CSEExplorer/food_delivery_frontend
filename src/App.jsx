@@ -1,35 +1,46 @@
-import { useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import AuthModal from "./components/auth/AuthModal";
+import ProfilePage from "./components/profile/ProfilePage";
+import ProtectedRoute from "./utils/ProtectedRoute";
+
 import { useAuthBootstrap } from "./hooks/useAuthBootstrap";
+import { useAuth } from "./hooks/useAuth";
 
 function App() {
-  /**
-   * authModal:
-   *  - null     → closed
-   *  - "login"  → login screen
-   *  - "signup" → signup screen
-   */
-  const [authModal, setAuthModal] = useState(null);
+  console.log("App mounted");
 
   // 🔐 Load user on app start (refresh-safe auth)
   useAuthBootstrap();
 
+  // 🔁 Global auth state (Redux)
+  const { showAuthModal, authMode, closeAuthModal } = useAuth();
+
   return (
     <>
-      {/* Auth Modal */}
-      {authModal && <AuthModal mode={authModal} setShowLogin={setAuthModal} />}
+      {/* 🌍 Global Auth Modal */}
+      {showAuthModal && (
+        <AuthModal mode={authMode} setShowLogin={closeAuthModal} />
+      )}
 
-      {/* Navbar */}
-      <Navbar setShowLogin={setAuthModal} />
+      {/* Navbar (no local auth state anymore) */}
+      <Navbar />
 
       {/* Routes */}
       <Routes>
         <Route path="/" element={<Home />} />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );

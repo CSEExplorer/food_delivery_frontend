@@ -4,6 +4,7 @@ import {
   register,
   sendOtp,
   verifyOtp,
+  logout,
   loadCurrentUser,
 } from "../features/auth/authThunks";
 import { resetAuthError } from "../features/auth/authSlice";
@@ -13,7 +14,12 @@ import {
   selectAuthError,
   selectOtpStatus,
   selectOtpError,
+  selectAuthUserId,
+  selectShowAuthModal,
+  selectAuthMode,
 } from "../features/auth/authSelectors";
+
+import { openAuthModal, closeAuthModal } from "../features/auth/authSlice";
 
 export const useAuth = () => {
   const dispatch = useDispatch();
@@ -24,14 +30,19 @@ export const useAuth = () => {
     error: useSelector(selectAuthError),
     otpLoading: useSelector(selectOtpStatus),
     otpError: useSelector(selectOtpError),
-
+    id: useSelector(selectAuthUserId),
     resetError: () => dispatch(resetAuthError()),
+
+    logout: () => dispatch(logout()),
 
     loginWithPassword: (payload) => dispatch(login(payload)),
 
     signup: (payload) => dispatch(register(payload)),
 
     sendOtp: (email) => dispatch(sendOtp(email)),
+
+    showAuthModal: useSelector(selectShowAuthModal),
+    authMode: useSelector(selectAuthMode),
 
     verifyOtp: async (payload) => {
       const res = await dispatch(verifyOtp(payload));
@@ -40,5 +51,8 @@ export const useAuth = () => {
       }
       return res;
     },
+
+    openAuthModal: (mode = "login") => dispatch(openAuthModal(mode)),
+    closeAuthModal: () => dispatch(closeAuthModal()),
   };
 };

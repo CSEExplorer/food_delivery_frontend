@@ -1,39 +1,27 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { assets } from "../assets/assets";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../features/auth/authThunks";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-const Navbar = ({ setShowLogin }) => {
-  const [menu, setMenu] = useState("home");
-  const [isOpen, setIsOpen] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
+import { assets } from "../assets/assets";
+import { useNavbar } from "../hooks/useNavbar";
+import { useAuth } from "../hooks/useAuth";
 
-  const location = useLocation();
-  const dispatch = useDispatch();
+const Navbar = () => {
+  const {
+    menu,
+    isOpen,
+    showDropdown,
+    setMenu,
+    setIsOpen,
+    setShowDropdown,
+    handleScroll,
+  } = useNavbar();
 
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { auth, logout, openAuthModal } = useAuth();
+  const { isAuthenticated } = auth;
 
-  useEffect(() => {
-    setMenu(
-      location.pathname === "/" ? "home" : location.pathname.replace("/", ""),
-    );
-  }, [location]);
-
-  const handleScroll = (sectionId) => {
-    if (location.pathname !== "/") {
-      window.location.href = `/#${sectionId}`;
-      return;
-    }
-
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  console.log("authen", isAuthenticated);
 
   const handleLogout = async () => {
-    await dispatch(logout());
+    await logout();
     setShowDropdown(false);
   };
 
@@ -112,19 +100,24 @@ const Navbar = ({ setShowLogin }) => {
 
         {/* AUTH AREA */}
         {!isAuthenticated ? (
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => setShowLogin("login")}
-              className="border border-blue-500 text-blue-500 px-4 py-2 rounded-lg
-                         hover:bg-blue-50 transition"
+              onClick={() => openAuthModal("login")}
+              className="px-4 py-2 rounded-lg font-medium
+               text-blue-600 border border-blue-300
+               hover:bg-blue-50 hover:border-blue-400
+               transition-all duration-200"
             >
               Login
             </button>
 
             <button
-              onClick={() => setShowLogin("signup")}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg
-                         hover:bg-blue-600 transition"
+              onClick={() => openAuthModal("signup")}
+              className="px-5 py-2 rounded-lg font-semibold
+               bg-blue-600 text-white
+               hover:bg-blue-700
+               shadow-sm hover:shadow-md
+               transition-all duration-200"
             >
               Sign Up
             </button>

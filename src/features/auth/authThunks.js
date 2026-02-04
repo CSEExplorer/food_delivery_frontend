@@ -46,8 +46,10 @@ export const register = createAsyncThunk(
 export const loadCurrentUser = createAsyncThunk(
   "auth/loadCurrentUser",
   async (_, { rejectWithValue }) => {
+    console.log("🔥 loadCurrentUser THUNK STARTED");
     try {
       const response = await fetchCurrentUser();
+      console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data);
