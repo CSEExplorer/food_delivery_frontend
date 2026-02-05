@@ -1,11 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserProfile, updateUserProfile } from "./profileThunks";
+import {
+  fetchUserProfile,
+  updateUserProfile,
+  fetchAddresses,
+} from "./profileThunks";
 
 const initialState = {
   data: null,
   status: "idle", // idle | loading | succeeded | failed
   error: null,
   lastFetched: null,
+  addresses: [],
 };
 
 const profileSlice = createSlice({
@@ -17,6 +22,7 @@ const profileSlice = createSlice({
       state.status = "idle";
       state.error = null;
       state.lastFetched = null;
+      state.addresses = [];
     },
   },
   extraReducers: (builder) => {
@@ -47,6 +53,18 @@ const profileSlice = createSlice({
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
         state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(fetchAddresses.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAddresses.fulfilled, (state, action) => {
+        state.loading = false;
+        state.addresses = action.payload;
+      })
+      .addCase(fetchAddresses.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload;
       });
   },

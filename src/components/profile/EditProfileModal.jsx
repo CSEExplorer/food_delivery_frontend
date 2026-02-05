@@ -1,14 +1,16 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
+const GENDERS = ["Male", "Female", "Other"];
+
 const EditProfileModal = ({ profile, onSave, onClose }) => {
   const [form, setForm] = useState({
     firstName: profile.firstName || "",
     lastName: profile.lastName || "",
     phone: profile.phone || "",
     bio: profile.bio || "",
-    country: profile.country || "",
-    city: profile.city || "",
+    dateOfBirth: profile.dateOfBirth || "",
+    gender: profile.gender || "",
     language: profile.language || "",
     timezone: profile.timezone || "",
   });
@@ -27,83 +29,96 @@ const EditProfileModal = ({ profile, onSave, onClose }) => {
       <div style={styles.modal}>
         <h3 style={styles.title}>Edit Profile</h3>
 
-        {/* Name */}
-        <div style={styles.row}>
+        {/* ---------- Personal Info ---------- */}
+        <Section title="Personal Information">
+          <div style={styles.row}>
+            <input
+              name="firstName"
+              value={form.firstName}
+              onChange={handleChange}
+              placeholder="First Name"
+              style={styles.input}
+            />
+            <input
+              name="lastName"
+              value={form.lastName}
+              onChange={handleChange}
+              placeholder="Last Name"
+              style={styles.input}
+            />
+          </div>
+
           <input
-            name="firstName"
-            value={form.firstName}
+            name="phone"
+            value={form.phone}
             onChange={handleChange}
-            placeholder="First Name"
+            placeholder="Phone"
             style={styles.input}
           />
 
-          <input
-            name="lastName"
-            value={form.lastName}
+          <textarea
+            name="bio"
+            value={form.bio}
             onChange={handleChange}
-            placeholder="Last Name"
-            style={styles.input}
+            placeholder="Bio"
+            rows={3}
+            style={styles.textarea}
           />
-        </div>
+        </Section>
 
-        {/* Contact */}
-        <input
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
-          placeholder="Phone"
-          style={styles.input}
-        />
+        {/* ---------- DOB & Gender ---------- */}
+        <Section title="Basic Details">
+          <div style={styles.row}>
+            <div style={styles.field}>
+              <label style={styles.label}>Date of Birth</label>
+              <input
+                type="date"
+                name="dateOfBirth"
+                value={form.dateOfBirth}
+                onChange={handleChange}
+                style={styles.input}
+              />
+            </div>
+          </div>
 
-        {/* Bio */}
-        <textarea
-          name="bio"
-          value={form.bio}
-          onChange={handleChange}
-          placeholder="Bio"
-          rows={3}
-          style={styles.textarea}
-        />
+          <div style={styles.genderGroup}>
+            {GENDERS.map((g) => (
+              <button
+                key={g}
+                type="button"
+                onClick={() => setForm((prev) => ({ ...prev, gender: g }))}
+                style={{
+                  ...styles.genderBtn,
+                  ...(form.gender === g ? styles.genderActive : {}),
+                }}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
+        </Section>
 
-        {/* Location */}
-        <div style={styles.row}>
-          <input
-            name="country"
-            value={form.country}
-            onChange={handleChange}
-            placeholder="Country"
-            style={styles.input}
-          />
+        {/* ---------- Preferences ---------- */}
+        <Section title="Preferences">
+          <div style={styles.row}>
+            <input
+              name="language"
+              value={form.language}
+              onChange={handleChange}
+              placeholder="Language"
+              style={styles.input}
+            />
+            <input
+              name="timezone"
+              value={form.timezone}
+              onChange={handleChange}
+              placeholder="Timezone"
+              style={styles.input}
+            />
+          </div>
+        </Section>
 
-          <input
-            name="city"
-            value={form.city}
-            onChange={handleChange}
-            placeholder="City"
-            style={styles.input}
-          />
-        </div>
-
-        {/* Preferences */}
-        <div style={styles.row}>
-          <input
-            name="language"
-            value={form.language}
-            onChange={handleChange}
-            placeholder="Language"
-            style={styles.input}
-          />
-
-          <input
-            name="timezone"
-            value={form.timezone}
-            onChange={handleChange}
-            placeholder="Timezone"
-            style={styles.input}
-          />
-        </div>
-
-        {/* Actions */}
+        {/* ---------- Actions ---------- */}
         <div style={styles.actions}>
           <button style={styles.cancel} onClick={onClose}>
             Cancel
@@ -117,7 +132,18 @@ const EditProfileModal = ({ profile, onSave, onClose }) => {
   );
 };
 
-/* ---------- Styles ---------- */
+/* ---------- Section Wrapper ---------- */
+const Section = ({ title, children }) => (
+  <div style={styles.section}>
+    <h4 style={styles.sectionTitle}>{title}</h4>
+    {children}
+  </div>
+);
+
+Section.propTypes = {
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
 const styles = {
   overlay: {
     position: "fixed",
@@ -132,15 +158,28 @@ const styles = {
   modal: {
     background: "#fff",
     padding: "28px",
-    borderRadius: "18px",
-    width: "420px",
-    boxShadow: "0 20px 50px rgba(0,0,0,0.15)",
+    borderRadius: "20px",
+    width: "460px",
+    boxShadow: "0 24px 60px rgba(0,0,0,0.18)",
   },
 
   title: {
-    margin: "0 0 16px",
-    fontSize: "18px",
+    margin: "0 0 12px",
+    fontSize: "20px",
     fontWeight: 600,
+  },
+
+  section: {
+    marginTop: "18px",
+  },
+
+  sectionTitle: {
+    fontSize: "13px",
+    fontWeight: 600,
+    color: "#888",
+    marginBottom: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
   },
 
   row: {
@@ -148,11 +187,22 @@ const styles = {
     gap: "12px",
   },
 
-  input: {
+  field: {
     flex: 1,
+  },
+
+  label: {
+    fontSize: "12px",
+    color: "#777",
+    marginBottom: "4px",
+    display: "block",
+  },
+
+  input: {
+    width: "100%",
     padding: "10px 12px",
     marginBottom: "12px",
-    borderRadius: "10px",
+    borderRadius: "12px",
     border: "1px solid #ddd",
     fontSize: "14px",
   },
@@ -161,17 +211,39 @@ const styles = {
     width: "100%",
     padding: "10px 12px",
     marginBottom: "12px",
-    borderRadius: "10px",
+    borderRadius: "12px",
     border: "1px solid #ddd",
     fontSize: "14px",
     resize: "none",
+  },
+
+  genderGroup: {
+    display: "flex",
+    gap: "10px",
+    marginBottom: "12px",
+  },
+
+  genderBtn: {
+    flex: 1,
+    padding: "10px",
+    borderRadius: "12px",
+    border: "1px solid #ddd",
+    background: "#fff",
+    cursor: "pointer",
+    fontSize: "14px",
+  },
+
+  genderActive: {
+    background: "#007AFF",
+    color: "#fff",
+    borderColor: "#007AFF",
   },
 
   actions: {
     display: "flex",
     justifyContent: "flex-end",
     gap: "12px",
-    marginTop: "16px",
+    marginTop: "20px",
   },
 
   cancel: {
@@ -185,9 +257,10 @@ const styles = {
     background: "#007AFF",
     color: "#fff",
     border: "none",
-    padding: "10px 18px",
-    borderRadius: "10px",
+    padding: "10px 20px",
+    borderRadius: "12px",
     cursor: "pointer",
+    fontWeight: 500,
   },
 };
 
@@ -204,7 +277,8 @@ EditProfileModal.propTypes = {
     bio: PropTypes.string,
     avatarUrl: PropTypes.string,
     phone: PropTypes.string,
-
+    dateOfBirth: PropTypes.string,
+    gender: PropTypes.string,
     country: PropTypes.string,
     city: PropTypes.string,
     language: PropTypes.string,
