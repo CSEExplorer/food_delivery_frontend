@@ -22,6 +22,8 @@ const ProfilePage = () => {
   // console.log("Hii i am auth from profile page", auth);
   const userId = auth?.user?.id;
   const profile = useSelector(selectProfile);
+
+  console.log("Hii i am auth from profile page", profile);
   const isLoading = useSelector(selectIsProfileLoading);
   const addresses = useSelector(selectAddresses);
 

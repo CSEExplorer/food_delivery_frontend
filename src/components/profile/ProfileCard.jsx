@@ -20,7 +20,7 @@ const ProfileCard = ({ profile, onEdit }) => {
             <h2 className="text-lg font-semibold text-gray-900">
               {profile.firstName} {profile.lastName}
             </h2>
-            <p className="text-sm text-gray-500">@{user.email}</p>
+            <p className="text-sm text-gray-500">@{profile.username}</p>
           </div>
         </div>
 
@@ -97,7 +97,7 @@ ProfileCard.propTypes = {
 
     firstName: PropTypes.string,
     lastName: PropTypes.string,
-
+    username: PropTypes.string,
     phone: PropTypes.string,
     dateOfBirth: PropTypes.string,
     gender: PropTypes.string,

@@ -1,8 +1,8 @@
-import { useAuth } from "../../hooks/useAuth";
+// import { useAuth } from "../../hooks/useAuth";
 import PropTypes from "prop-types";
 const ProfileHeader = ({ profile }) => {
-  const { auth } = useAuth();
-  const user = auth.user;
+  // const { auth } = useAuth();
+  // const user = auth.user;
   return (
     <div className="relative overflow-hidden">
       {/* Background */}
@@ -37,7 +37,9 @@ const ProfileHeader = ({ profile }) => {
 
             <p className="text-sm text-gray-300 mt-1">
               {" "}
-              <span className="text-gray-200 font-medium">{user.email}</span>
+              <span className="text-gray-200 font-medium">
+                {profile.username}
+              </span>
             </p>
           </div>
         </div>
